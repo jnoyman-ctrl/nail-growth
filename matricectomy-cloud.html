@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingrown toenail procedures: word cloud</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<style>
+:root{
+  --ink:#1b2224; --ink2:#5d686b;
+  --fold:#0e7c62; --matrix:#4a3fb4; --accent:#e4572e; --gray:#c3c9c6;
+  --ui:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#fff}
+body{font-family:var(--ui);-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none}
+#stage{position:fixed;inset:0;background:#fff;cursor:default;touch-action:manipulation}
+#cloud{position:absolute;inset:0}
+.w{position:absolute;left:0;top:0;white-space:nowrap;transform-origin:50% 50%;
+   transition:transform 1.15s cubic-bezier(.22,.8,.22,1),opacity .7s ease}
+body.still .w,body.still .t,body.still .g,body.still .mx,body.still .mx::before,body.still #legend,body.still .li{transition:none!important}
+.f{display:block;animation:bob var(--bd,8s) ease-in-out var(--bl,0s) infinite alternate}
+@keyframes bob{from{transform:translateY(-.045em)}to{transform:translateY(.045em)}}
+.w.lead .f{animation:none}
+.p{position:relative;display:block;opacity:0;transform:scale(.25);
+   transition:transform .6s cubic-bezier(.3,1.45,.55,1),opacity .35s ease}
+.w.in .p{opacity:1;transform:none}
+.t{display:block;line-height:1.12;color:var(--ink);transition:color .7s ease var(--d,0s),opacity .7s ease var(--d,0s)}
+.w.alt .t{color:var(--ink2)}
+.g{position:absolute;left:0;top:0;line-height:1.12;opacity:0;pointer-events:none;
+   background-image:linear-gradient(90deg,var(--fold) 42%,var(--matrix) 58%);
+   -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+   transition:opacity .7s ease var(--d,0s)}
+.mx{position:relative;display:inline-block;transition:color .6s ease var(--d,0s)}
+.mx::before{content:"";position:absolute;left:-.06em;right:-.06em;bottom:.1em;height:.4em;border-radius:.1em;
+   background:rgba(228,87,46,.17);transform:scaleX(0);transform-origin:0 50%;
+   transition:transform .6s cubic-bezier(.3,.8,.3,1) var(--d,0s);z-index:-1}
+/* click 1: what each method acts on */
+.w.cat.fold .t{color:var(--fold)}
+.w.cat.matrix .t{color:var(--matrix)}
+.w.cat.other .t{color:var(--ink2)}
+.w.cat.both .t{opacity:0}
+.w.cat.both .g{opacity:1}
+/* click 2: no longer recommended */
+.w.obs .t{color:var(--gray)!important;opacity:1!important}
+.w.obs .g{opacity:0!important}
+/* click 3: matricectomy */
+.w.mxon .mx{color:var(--accent)}
+.w.mxon .mx::before{transform:scaleX(1)}
+.w.dim3{opacity:.3}
+/* click 4: the two leading methods */
+.w.dim4{opacity:.08}
+.w.hide4{opacity:0}
+.w.lead .t{text-shadow:0 0 .3em #fff,0 0 .6em #fff,0 0 1em #fff}
+#legend{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;
+   color:var(--ink2);font-weight:500;white-space:nowrap;opacity:0;transition:opacity .6s ease;pointer-events:none}
+#legend.on{opacity:1}
+.li{display:flex;align-items:center;gap:.45em;opacity:0;margin-left:1.6em;transition:opacity .6s ease}
+.li:first-child{margin-left:0}
+.li.on{opacity:1}
+.li[data-k="obs"]{max-width:0;margin-left:0;overflow:hidden;transition:opacity .6s ease,max-width .6s ease,margin-left .6s ease}
+.li[data-k="obs"].on{max-width:16em;margin-left:1.6em}
+.sw{display:inline-block;width:.8em;height:.8em;border-radius:.2em}
+#hot{position:fixed;right:0;bottom:0;width:130px;height:72px}
+#nav{position:fixed;right:8px;bottom:8px;display:flex;gap:6px;opacity:0;transition:opacity .25s}
+#hot:hover + #nav,#nav:hover{opacity:.85}
+#nav button{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink2);background:#fff;color:var(--ink);font:600 16px/1 var(--ui);padding:0;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.f{animation:none}}
+</style>
+</head>
+<body>
+<div id="stage" role="img" aria-label="Word cloud of ingrown toenail procedures">
+  <div id="cloud"></div>
+  <div id="legend">
+    <span class="li" data-k="fold"><i class="sw" style="background:var(--fold)"></i>Nail fold</span>
+    <span class="li" data-k="matrix"><i class="sw" style="background:var(--matrix)"></i>Nail matrix</span>
+    <span class="li" data-k="both"><i class="sw" style="background:linear-gradient(90deg,var(--fold) 50%,var(--matrix) 50%)"></i>Both</span>
+    <span class="li" data-k="obs"><i class="sw" style="background:var(--gray)"></i>No longer recommended</span>
+  </div>
+</div>
+<div id="hot"></div>
+<div id="nav"><button id="b-back" type="button" title="Back" aria-label="Back">&#8249;</button><button id="b-reset" type="button" title="Start over" aria-label="Start over">&#8634;</button></div>
+<script>
+(function(){
+"use strict";
+/* [text, what it acts on (fold | matrix | both | other), size, flags]
+   flags: o = no longer recommended (Haneke 2012), L = leading method */
+var DATA=[
+  ["Partial matricectomy","matrix",44,""],
+  ["Super U","fold",40,""],
+  ["Winograd","both",38,""],
+  ["Zadik","matrix",38,"o"],
+  ["Frost","matrix",36,""],
+  ["Phenol matricectomy","matrix",34,"L"],
+  ["Vandenbos procedure","fold",32,""],
+  ["Nail avulsion","other",32,"o"],
+  ["CO₂ laser matricectomy","matrix",30,"L"],
+  ["Total matricectomy","matrix",30,""],
+  ["Emmert wedge excision","both",30,"o"],
+  ["Howard–Dubois","fold",30,""],
+  ["Kocher","both",30,"o"],
+  ["TCA matricectomy","matrix",28,""],
+  ["Surgical matricectomy","matrix",28,""],
+  ["Quénu","matrix",28,"o"],
+  ["Suppan","matrix",28,""],
+  ["Sodium hydroxide matricectomy","matrix",26,""],
+  ["Noël procedure","fold",26,""],
+  ["Baudens","both",26,"o"],
+  ["Kaplan","matrix",26,""],
+  ["Radiofrequency matricectomy","matrix",24,""],
+  ["Electrocautery matricectomy","matrix",24,""],
+  ["Terminal Syme amputation","both",24,"o"],
+  ["Soft-tissue debulking","fold",24,""],
+  ["Cryosurgical matricectomy","matrix",22,""],
+  ["Curettage matricectomy","matrix",22,""]
+];
+var MAX=4, step=0, started=false, inOffice=false;
+var cloud=document.getElementById("cloud"), legend=document.getElementById("legend");
+var legendItems=[].slice.call(legend.querySelectorAll(".li"));
+
+function seeded(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=seeded(20261124);
+
+var W=DATA.map(function(d,i){
+  var el=document.createElement("div");
+  el.className="w "+d[1]+(i%2?" alt":"");
+  el.style.fontWeight=d[2]>=36?700:(d[2]>=28?600:500);
+  var f=document.createElement("span");f.className="f";
+  f.style.setProperty("--bd",(6+rnd()*4).toFixed(2)+"s");
+  f.style.setProperty("--bl",(-rnd()*9).toFixed(2)+"s");
+  var p=document.createElement("span");p.className="p";
+  var t=document.createElement("span");t.className="t";
+  var parts=d[0].split("matricectomy");
+  parts.forEach(function(s,j){
+    if(j>0){var m=document.createElement("span");m.className="mx";m.textContent="matricectomy";t.appendChild(m);}
+    if(s)t.appendChild(document.createTextNode(s));
+  });
+  p.appendChild(t);
+  if(d[1]==="both"){var g=document.createElement("span");g.className="g";g.textContent=d[0];p.appendChild(g);}
+  f.appendChild(p);el.appendChild(f);cloud.appendChild(el);
+  return {el:el,size:d[2],cat:d[1],o:d[3].indexOf("o")>=0,L:d[3].indexOf("L")>=0,mx:parts.length>1,i:i};
+});
+
+function layout(){
+  var VW=window.innerWidth, VH=window.innerHeight, mn=Math.min(VW,VH);
+  var margin=Math.max(10,mn*0.06);
+  var lfs=Math.max(11,Math.min(22,mn*0.03));
+  legend.style.fontSize=lfs+"px";
+  legend.style.bottom=Math.max(6,margin*0.55)+"px";
+  var legendH=lfs*2.4;
+  var availW=VW-2*margin, availH=VH-2*margin-legendH;
+  W.forEach(function(w){w.el.style.fontSize=w.size+"px";});
+  W.forEach(function(w){w.bw=w.el.offsetWidth;w.bh=w.el.offsetHeight;});
+  var a=availW/availH, ex=Math.sqrt(a), ey=1/Math.sqrt(a);
+  var r2=seeded(7), placed=[];
+  function hit(x,y,hw,hh){
+    for(var j=0;j<placed.length;j++){var q=placed[j];if(Math.abs(x-q.x)<hw+q.hw&&Math.abs(y-q.y)<hh+q.hh)return true;}
+    return false;
+  }
+  var order=W.slice().sort(function(p,q){return q.size-p.size||p.i-q.i;});
+  order.forEach(function(w,k){
+    var hw=w.bw/2+w.size*0.16, hh=w.bh/2+w.size*0.05, x=0, y=0, th0=r2()*Math.PI*2;
+    if(k>0){
+      for(var t=0;t<6000;t+=0.05){
+        var r=1.6*t;
+        x=r*Math.cos(t+th0)*ex; y=r*Math.sin(t+th0)*ey;
+        if(!hit(x,y,hw,hh))break;
+      }
+    }
+    w.x=x;w.y=y;w.hw=hw;w.hh=hh;w.rank=k;placed.push(w);
+  });
+  var x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  W.forEach(function(w){x0=Math.min(x0,w.x-w.bw/2);x1=Math.max(x1,w.x+w.bw/2);y0=Math.min(y0,w.y-w.bh/2);y1=Math.max(y1,w.y+w.bh/2);});
+  var s=Math.min(availW/(x1-x0),availH/(y1-y0)), bcx=(x0+x1)/2, bcy=(y0+y1)/2;
+  W.forEach(function(w){
+    w.el.style.fontSize=(w.size*s).toFixed(2)+"px";
+    w.cx=margin+availW/2+(w.x-bcx)*s;
+    w.cy=margin+availH/2+(w.y-bcy)*s;
+    w.el.style.setProperty("--d",(0.55*(w.cx/VW)).toFixed(3)+"s");
+  });
+  var leads=W.filter(function(w){return w.L;});
+  var lw=Math.max.apply(null,leads.map(function(w){return w.bw*s;}));
+  var lh=Math.max.apply(null,leads.map(function(w){return w.bh*s;}));
+  var k=Math.min(1.9,(VW-2*margin)*0.94/lw,(VH-2*margin)*0.62/(2*lh));
+  var gap=lh*k*0.6;
+  leads.forEach(function(w,j){w.lx=VW/2;w.ly=VH/2+(j===0?-gap:gap);w.lk=k;});
+  var bx0=Infinity,bx1=-Infinity,by0=Infinity,by1=-Infinity;
+  leads.forEach(function(w){var hw=w.bw*s*k/2,hh=w.bh*s*k/2;bx0=Math.min(bx0,w.lx-hw);bx1=Math.max(bx1,w.lx+hw);by0=Math.min(by0,w.ly-hh);by1=Math.max(by1,w.ly+hh);});
+  bx0-=VW*0.03;bx1+=VW*0.03;by0-=lh*k*0.3;by1+=lh*k*0.3;
+  W.forEach(function(w){
+    if(w.L){w.under=false;return;}
+    var hw=w.bw*s/2,hh=w.bh*s/2;
+    w.under=!(w.cx+hw<bx0||w.cx-hw>bx1||w.cy+hh<by0||w.cy-hh>by1);
+  });
+}
+
+function place(w){
+  var lead=step>=4&&w.L;
+  var x=lead?w.lx:w.cx, y=lead?w.ly:w.cy, k=lead?w.lk:(step>=4?0.96:1);
+  w.el.style.transform="translate("+x.toFixed(1)+"px,"+y.toFixed(1)+"px) translate(-50%,-50%) scale("+k.toFixed(3)+")";
+}
+
+function apply(){
+  W.forEach(function(w){
+    var c=w.el.classList, mxOn=step>=3&&w.mx&&!w.o;
+    c.toggle("cat",step>=1);
+    c.toggle("obs",step>=2&&w.o);
+    c.toggle("mxon",mxOn);
+    c.toggle("dim3",step===3&&!mxOn);
+    c.toggle("dim4",step>=4&&!w.L&&!w.under);
+    c.toggle("hide4",step>=4&&!w.L&&w.under);
+    c.toggle("lead",step>=4&&w.L);
+    place(w);
+  });
+  legend.classList.toggle("on",step===1||step===2);
+  legendItems.forEach(function(li){
+    var key=li.getAttribute("data-k");
+    li.classList.toggle("on",key==="obs"?step===2:(step===1||step===2));
+  });
+  document.body.setAttribute("data-step",String(step));
+}
+
+var timers=[];
+function playEntrance(){
+  timers.forEach(clearTimeout);timers=[];
+  W.forEach(function(w){w.el.classList.remove("in");});
+  void cloud.offsetWidth;
+  W.slice().sort(function(p,q){return p.rank-q.rank;}).forEach(function(w,k){
+    timers.push(setTimeout(function(){w.el.classList.add("in");},150+k*75));
+  });
+}
+
+function next(){if(step<MAX){step++;apply();}else officeGo(1);}
+function back(){if(step>0){step--;apply();}else officeGo(-1);}
+function reset(){step=0;apply();playEntrance();}
+
+function officeGo(dir){
+  if(!inOffice)return;
+  try{Office.context.document.goToByIdAsync(dir>0?Office.Index.Next:Office.Index.Previous,Office.GoToType.Index,function(){});}catch(e){}
+}
+
+document.addEventListener("click",function(e){
+  if(e.target&&e.target.closest&&e.target.closest("#nav"))return;
+  next();
+});
+document.addEventListener("contextmenu",function(e){e.preventDefault();back();});
+document.getElementById("b-back").addEventListener("click",function(e){e.stopPropagation();back();});
+document.getElementById("b-reset").addEventListener("click",function(e){e.stopPropagation();reset();});
+document.addEventListener("keydown",function(e){
+  var k=e.key;
+  if(k==="ArrowRight"||k==="ArrowDown"||k==="PageDown"||k===" "||k==="Spacebar"||k==="Enter"||k==="n"||k==="N")next();
+  else if(k==="ArrowLeft"||k==="ArrowUp"||k==="PageUp"||k==="Backspace"||k==="p"||k==="P")back();
+  else if(k==="r"||k==="R"||k==="Home")reset();
+  else return;
+  e.preventDefault();e.stopImmediatePropagation();
+},true);
+
+var rt=0;
+window.addEventListener("resize",function(){
+  clearTimeout(rt);
+  rt=setTimeout(function(){
+    if(!started)return;
+    document.body.classList.add("still");
+    layout();apply();
+    void document.body.offsetWidth;
+    requestAnimationFrame(function(){requestAnimationFrame(function(){document.body.classList.remove("still");});});
+  },120);
+});
+
+var hiddenAt=0;
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="hidden"){hiddenAt=Date.now();return;}
+  if(!started){begin();return;}
+  if(hiddenAt&&Date.now()-hiddenAt>1500)reset();
+});
+
+function begin(){
+  if(started||document.visibilityState==="hidden")return;
+  started=true;
+  document.body.classList.add("still");
+  layout();step=0;apply();
+  void document.body.offsetWidth;
+  requestAnimationFrame(function(){document.body.classList.remove("still");playEntrance();});
+}
+
+try{
+  Office.onReady(function(info){
+    inOffice=!!(info&&info.host);
+    if(!inOffice)return;
+    try{
+      Office.context.document.addHandlerAsync(Office.EventType.ActiveViewChanged,function(ev){
+        if(ev&&ev.activeView==="read"&&started)reset();
+      });
+    }catch(e){}
+  });
+}catch(e){}
+
+var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+ready.then(function(){requestAnimationFrame(begin);});
+
+window.__cloud={next:next,back:back,reset:reset,state:function(){return step;}};
+})();
+</script>
+</body>
+</html>
